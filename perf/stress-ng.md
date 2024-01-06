@@ -1,4 +1,11 @@
 ## stress
+~~~
+stress --vm 1 --vm-bytes 1GB --vm-keep
+~~~
+* `--vm <N>` - Start N workers spinning on malloc()/free()
+* `--vm-bytes` - malloc B bytes per vm worker.
+* `--vm-keep` - redirty memory instead of freeing and reallocating
+
 
 ## stress-ng
 ### Description
@@ -34,6 +41,7 @@ This shows you can run multiple workers running multiple tests.
 stress-ng --vm 2 --vm-bytes 2G --mmap 2 --mmap-bytes 2G --page-in
 ~~~
 This will test memory pressure on a system with 4 GB of memory between 2 workers calling mmap.
+
 * `--vm <N>` - Start N workers spinning on anonymous mmap.
 * `--vm-bytes <N>` - Allocate N bytes per vm worker (Default 256MB).
 * `--mmap <N>` - Start N workers stressing mmap and munmap.

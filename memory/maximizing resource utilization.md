@@ -19,3 +19,17 @@
  * `memory.min` - Specifies a minimum amount of memory the cgroup must always retain, which can never be reclaimed by the system.
  * `memory.swap.max` - Swap usage hard limit. If a cgroup's swap usage reaches this limit, anonymous memory of the cgroup will not be swapped out.
  * The problem with `memory.high` is that it made processes more prone to thrashing and OOMs. Instead `memory.low` provides a soft-guarantee memory to cgroups.
+ * In order to find an optimal `memory.low` setting, you may need to first determine a working set size for the memory. This can be done by applying memory pressure and read `memory.current` on a number of machines and averaging the result. 
+* Memory overcommit is a strategy based on the assumption that not all of the assigned memory will be needed at the same time. When demand exceeds the total memory available, the system OOM handler tries to reclaim memory by killing a process.
+* Load shedding is a technique to avoid overloadidng and crashing a system by temporarily rejecting new requests. The assumption is that all loads will be better served if the system rejects a few and continues to run.
+* [oomd](https://facebookincubator.github.io/oomd) is a userspace tool, similiar to the kernel OOM handler, but uses memory pressure to provide greater control over when processes start getting killed and which processes are selected.
+* The kernel's OOM killer main job is to protect the kernel. It is triggered only after failing at multiple attempts to allocate memory. It will typically kill whichever process will free the most memory and can fail when the system is thrashing.
+* IO Controller
+ * Cgroups1 accounts for only direct IO and buffered reads. This does not account for buffered IO.
+ * Cgroups2 provides comprehensive control and accounting of all IOs per-cgroup: buffered, filesystem metadata, swap, and direct IOs.
+ * `io.latency` - A mechanism to guarantee a cgroup's level of IO completion latency. If the average completition latency are longer than the target set here, other processes are throttled to provide more IO.
+ * `io.pressure` - Gives the percentage of wall time in which some or all tasks are waiting for a block device, or IO.
+ * `io.stat` - IO usage statistics
+ * `io.max` - Specify IO limits.
+* Workloads are protected by specifying a latency target with `io.latency`. If the protected workload experiences average completion latency longer than its latency target value, the controller throttles any peers that have a more relaxed latency target than the protected workload.
+* 
